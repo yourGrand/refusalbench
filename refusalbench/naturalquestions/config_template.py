@@ -13,7 +13,7 @@ OPENAI_API_KEY = "YOUR_OPENAI_API_KEY_HERE"  # or set to None if not using OpenA
 
 # Model IDs
 DEFAULT_GENERATOR_MODEL = 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0'
-DEFAULT_EVALUATOR_MODEL = 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0'
+DEFAULT_EVALUATOR_MODEL = 'bedrock/us.anthropic.claude-sonnet-4-6'
 
 # Dataset Paths
 # ORIGINAL_DATASET_PATH should point to a JSONL file from Natural Questions (NQ) dataset

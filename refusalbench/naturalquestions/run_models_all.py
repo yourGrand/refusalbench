@@ -9,6 +9,7 @@ import json
 import time
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 from tqdm.asyncio import tqdm as atqdm
 import asyncio
 import litellm
@@ -82,7 +83,13 @@ class AsyncRAGModelEvaluator:
             "REFUSE_NONFACTUAL_QUERY",
             "REFUSE_OTHER"
         ]
-    
+        self._inference_progress = None
+        self._judge_progress = None
+        self._eval_progress = None
+
+    @staticmethod
+    def _short_model_name(model_id: str) -> str:
+        return model_id.split("/")[-1][:28]
     @retry(
         wait=wait_random_exponential(min=2, max=30),
         stop=stop_after_attempt(100),
@@ -202,6 +209,18 @@ class AsyncRAGModelEvaluator:
             print(f"Existing results: {existing_num_examples} examples")
             print(f"Current request: {current_num_examples} examples")
             print(f"Will proceed with incremental evaluation but metrics may not be comparable")
+
+        current_languages = sorted({entry.get('language', 'en') for entry in dataset[:current_num_examples]})
+        if 'language' in existing_results_df.columns:
+            existing_languages = sorted(existing_results_df['language'].fillna('en').unique())
+        else:
+            existing_languages = ['en']
+
+        if current_languages != existing_languages:
+            print(f"WARNING: Dataset language mismatch!")
+            print(f"Existing results languages: {existing_languages}")
+            print(f"Current dataset languages: {current_languages}")
+            print(f"Will proceed with incremental evaluation but metrics may not be comparable")
         
         return True
     
@@ -270,6 +289,9 @@ class AsyncRAGModelEvaluator:
         
         prompt = prompt_template.format(query=query, context=context)
         response = await self._call_model_async(model_id, prompt)
+        if self._inference_progress is not None:
+            self._inference_progress.update(1)
+            self._inference_progress.set_postfix(model=self._short_model_name(model_id), refresh=False)
         return response.strip()
 
     async def classify_and_evaluate_response(self, model_output, query, correct_answers=None):
@@ -336,6 +358,9 @@ QUALITY_SCORE: [1-5 if answer_attempt with references, otherwise N/A]
 EXPLANATION: [brief reasoning for both classification and score]"""
 
         response = await self._call_model_async(self.evaluator_engine_id, universal_prompt)
+        if self._judge_progress is not None:
+            self._judge_progress.update(1)
+            self._judge_progress.set_postfix(judge=self._short_model_name(self.evaluator_engine_id), refresh=False)
         
         # Parse the response
         try:
@@ -399,6 +424,7 @@ EXPLANATION: [brief reasoning for both classification and score]"""
         generator_model = entry.get('generator_model', '')
         perturbation_class = entry.get('perturbation_class', '')
         intensity = entry.get('intensity', '')
+        language = entry.get('language', 'en')
         
         # Skip entries with no context or query
         if not context or not query:
@@ -407,8 +433,6 @@ EXPLANATION: [brief reasoning for both classification and score]"""
             
         # Evaluate each specified model
         for model_id in models_to_evaluate:
-            print(f"Evaluating {model_id} on example {entry_idx}")
-            
             try:
                 # Get model prediction
                 model_raw_output = await self.get_model_answer(model_id, context, query)
@@ -428,6 +452,7 @@ EXPLANATION: [brief reasoning for both classification and score]"""
                     'generator_model': generator_model,
                     'perturbation_class': perturbation_class,
                     'intensity': intensity,
+                    'language': language,
                     'query': query,
                     'ground_truth_label': ground_truth_label,
                     'ground_truth_answer': correct_answer if correct_answer else None,
@@ -465,6 +490,13 @@ EXPLANATION: [brief reasoning for both classification and score]"""
                         result['llm_evaluation_explanation'] = explanation
                 
                 results.append(result)
+                if self._eval_progress is not None:
+                    self._eval_progress.update(1)
+                    self._eval_progress.set_postfix(
+                        model=self._short_model_name(model_id),
+                        example=entry_idx,
+                        refresh=False,
+                    )
                 
             except Exception as e:
                 print(f"Error evaluating {model_id} on example {entry_idx}: {e}")
@@ -476,6 +508,7 @@ EXPLANATION: [brief reasoning for both classification and score]"""
                     'generator_model': generator_model,
                     'perturbation_class': perturbation_class,
                     'intensity': intensity,
+                    'language': language,
                     'query': query,
                     'ground_truth_label': ground_truth_label,
                     'ground_truth_answer': correct_answer if correct_answer else None,
@@ -485,6 +518,8 @@ EXPLANATION: [brief reasoning for both classification and score]"""
                     'refusal_match_correct': None,
                     'llm_evaluation_explanation': "Evaluation failed due to error"
                 })
+                if self._eval_progress is not None:
+                    self._eval_progress.update(1)
                 
         return results
     
@@ -505,26 +540,49 @@ EXPLANATION: [brief reasoning for both classification and score]"""
             dataset = dataset[:num_examples]
         
         print(f"Evaluating {len(models_to_evaluate)} models on {len(dataset)} examples")
-        
+        total_evals = len(dataset) * len(models_to_evaluate)
+        num_batches = (len(dataset) - 1) // self.batch_size + 1 if dataset else 0
+
+        self._inference_progress = tqdm(
+            total=total_evals, desc="Model inference", unit="call", position=0, leave=True
+        )
+        self._judge_progress = tqdm(
+            total=total_evals, desc="LLM judge", unit="call", position=1, leave=True
+        )
+        self._eval_progress = tqdm(
+            total=total_evals,
+            desc="Overall (example × model)",
+            unit="eval",
+            position=2,
+            leave=True,
+        )
+
         all_results = []
-        
-        # Process in batches
-        for i in range(0, len(dataset), self.batch_size):
-            batch = dataset[i:i+self.batch_size]
-            batch_tasks = [
-                self.process_example(i+idx, entry, models_to_evaluate) 
-                for idx, entry in enumerate(batch)
-            ]
-            
-            # Wait for all tasks in the batch to complete
-            batch_results = await atqdm.gather(
-                *batch_tasks,
-                desc=f"Processing batch {i//self.batch_size + 1}/{(len(dataset)-1)//self.batch_size + 1}"
-            )
-            
-            # Flatten results and add to all_results
-            for result_list in batch_results:
-                all_results.extend(result_list)
+        try:
+            for i in range(0, len(dataset), self.batch_size):
+                batch = dataset[i:i+self.batch_size]
+                batch_tasks = [
+                    self.process_example(i+idx, entry, models_to_evaluate) 
+                    for idx, entry in enumerate(batch)
+                ]
+
+                batch_num = i // self.batch_size + 1
+                batch_results = await atqdm.gather(
+                    *batch_tasks,
+                    desc=f"Batches {batch_num}/{num_batches}",
+                    position=3,
+                    leave=False,
+                )
+
+                for result_list in batch_results:
+                    all_results.extend(result_list)
+        finally:
+            for bar in (self._inference_progress, self._judge_progress, self._eval_progress):
+                if bar is not None:
+                    bar.close()
+            self._inference_progress = None
+            self._judge_progress = None
+            self._eval_progress = None
         
         return pd.DataFrame(all_results)
     
@@ -786,7 +844,8 @@ EXPLANATION: [brief reasoning for both classification and score]"""
             'total_predictions': len(results_df),
             'evaluator_engine': self.evaluator_engine_id,
             'batch_size': self.batch_size,
-            'max_concurrent': self.max_concurrent
+            'max_concurrent': self.max_concurrent,
+            'language_distribution': results_df['language'].fillna('en').value_counts().to_dict() if 'language' in results_df.columns else {'en': len(results_df)}
         }
         
         results_file = self.save_results(results_df, metadata=metadata)
@@ -813,57 +872,43 @@ EXPLANATION: [brief reasoning for both classification and score]"""
         return asyncio.run(self.run_async(dataset_path, num_examples, incremental))
 
 # Main execution function
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
 async def main_async():
     """
     Main function to run the RefusalBench evaluation.
     """
-    # Import configuration if available for defaults
-    try:
-        from config import DEFAULT_EVALUATOR_MODEL
-        evaluation_engine = DEFAULT_EVALUATOR_MODEL
-    except:
-        evaluation_engine = 'bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0'
+    # Judge model (LLM-as-judge for classification + answer scoring)
+    evaluation_engine = 'bedrock/us.anthropic.claude-sonnet-4-6'
 
-    # Configuration
-    dataset_path = '/data/group_data/r3lit_shared/ragdynabench/refusalbench/filtered_refusalbench_analysis/unified_cross_model_dataset_flattened_stratified.jsonl'
-    
-    # Models to evaluate
+    # Configuration — multilingual pilot (edit models list to control cost)
+    dataset_path = str(PROJECT_ROOT / 'data/pilot/pilot_multilingual.jsonl')
+    output_dir = str(PROJECT_ROOT / 'refusalbench_evaluation_results_pilot_multilingual')
+    # Full benchmark:
+    # dataset_path = '/data/group_data/r3lit_shared/ragdynabench/refusalbench/filtered_refusalbench_analysis/unified_cross_model_dataset_flattened_stratified.jsonl'
+    # output_dir = './refusalbench_evaluation_results_all_stratified'
 
-    # Models to evaluate
     models_to_evaluate = [
-        "bedrock/us.anthropic.claude-3-5-sonnet-20241022-v2:0", 
-        "bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0",
-        "bedrock/us.anthropic.claude-opus-4-20250514-v1:0",
-        "bedrock/us.amazon.nova-pro-v1:0",  
-        "bedrock/converse/us.amazon.nova-premier-v1:0",
-        "openai/gpt-4o-2024-08-06", 
-        "openai/gpt-4.1-2025-04-14",
-        "openai/o4-mini-2025-04-16",
-        "bedrock/converse/us.deepseek.r1-v1:0"
-        
-    # ]
-
-    # models_to_evaluate = [
-    #     "bedrock/converse/us.meta.llama3-1-8b-instruct-v1:0", 
-    #     "bedrock/converse/us.meta.llama3-1-70b-instruct-v1:0",
-        # "bedrock/converse/us.huggingface-llm-qwen2-5-7b-instruct",
-        # "bedrock/converse/us.huggingface-llm-qwen2-5-14b-instruct",
-        # "bedrock/converse/us.huggingface-llm-qwen2-5-32b-instruct",
-        # "bedrock/converse/us.huggingface-llm-qwen2-5-72b-instruct",
+        "bedrock/meta.llama3-8b-instruct-v1:0",
+        "bedrock/qwen.qwen3-32b-v1:0",
     ]
-    
-    output_dir = './refusalbench_evaluation_results_all_stratified'
+    # Full model list:
+    # models_to_evaluate = [
+    #     "bedrock/us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+    #     "bedrock/us.anthropic.claude-sonnet-4-20250514-v1:0",
+    #     ...
+    # ]
     
     # Number of examples to evaluate (set to None to evaluate all)
     num_examples = None
     
-    # Initialize evaluator
+    # Lower concurrency to reduce Bedrock rate limits on the Sonnet 4.6 judge.
     evaluator = AsyncRAGModelEvaluator(
         model_ids=models_to_evaluate,
         evaluator_engine_id=evaluation_engine,
         output_dir=output_dir,
-        batch_size=5,  # Smaller batch size for more complex evaluation
-        max_concurrent=10,  # Reduced concurrency for stability
+        batch_size=2,
+        max_concurrent=3,
         temperature=0.1,
         max_tokens=2000
     )

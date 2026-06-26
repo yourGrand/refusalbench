@@ -1,0 +1,25 @@
+{
+  "evaluation_timestamp": "2026-06-26T14:51:36.875711",
+  "dataset_path": "/mnt/parscratch/users/acb22av/private/projects/refusalbench/data/pilot/pilot_multilingual.jsonl",
+  "num_examples_evaluated": 90,
+  "incremental_mode": true,
+  "models_in_results": [
+    "bedrock/meta.llama3-8b-instruct-v1:0",
+    "bedrock/qwen.qwen3-32b-v1:0"
+  ],
+  "new_models_evaluated": [
+    "bedrock/meta.llama3-8b-instruct-v1:0",
+    "bedrock/qwen.qwen3-32b-v1:0"
+  ],
+  "total_predictions": 180,
+  "evaluator_engine": "bedrock/us.anthropic.claude-sonnet-4-6",
+  "batch_size": 2,
+  "max_concurrent": 3,
+  "language_distribution": {
+    "en": 36,
+    "ru": 36,
+    "zh": 36,
+    "pl": 36,
+    "de": 36
+  }
+}
