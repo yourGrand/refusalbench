@@ -1,0 +1,29 @@
+[project]
+name = "refusalbench"
+version = "0.1.0"
+description = "RefusalBench evaluation and multilingual pilot tooling"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "litellm>=1.0.0",
+    "aiohttp",
+    "tenacity>=8.0.0",
+    "pandas>=1.5.0",
+    "numpy>=1.22.0",
+    "jsonlines",
+    "datasets",
+    "tqdm",
+    "python-dotenv",
+    "boto3>=1.26.0",
+    "botocore>=1.29.0",
+    "matplotlib>=3.5.0",
+]
+
+[dependency-groups]
+dev = [
+    "jupyter",
+    "ipykernel",
+    "notebook",
+    "seaborn>=0.12.0",
+    "plotly>=5.0.0",
+]
