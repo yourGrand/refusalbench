@@ -50,7 +50,9 @@ See each dataset card for the full field schema.
 ```
 refusalbench/
 ├── README.md                           # This file
-├── requirements.txt                    # Python dependencies
+├── pyproject.toml                      # Project metadata and dependencies (uv)
+├── uv.lock                             # Pinned dependency lockfile
+├── requirements.txt                    # Python dependencies (pip fallback)
 ├── .gitignore                         # Git ignore rules
 │
 ├── refusalbench/                      # Main codebase
@@ -89,7 +91,10 @@ refusalbench/
 git clone https://github.com/aashiqmuhamed/refusalbench.git
 cd refusalbench
 
-# Install dependencies
+# Install dependencies (uv, recommended: creates .venv and installs refusalbench editable)
+uv sync --all-groups
+
+# Or with pip
 pip install -r requirements.txt
 
 # Configure API credentials for NQ dataset

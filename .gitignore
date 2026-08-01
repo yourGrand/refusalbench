@@ -31,6 +31,7 @@ wheels/
 config.py
 .env
 *.env
+!.env.example
 
 # API Keys and Credentials
 *credentials*
