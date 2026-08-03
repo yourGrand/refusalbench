@@ -49,6 +49,7 @@ refusalbench/*_temp*/
 *.csv
 !*_template.jsonl
 !*_example.csv
+!data/pilot_v2/refusalbench_translation_shared_prompts.csv
 
 # Logs
 *.log

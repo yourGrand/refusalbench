@@ -1,0 +1,243 @@
+segment_id,component,english_text,PL,RU,ZH_YUE,ZH_CMN,notes
+sys_role,System Prompt - Role Description,"You are an advanced AI assistant designed to answer questions based **only** on the provided context passages. You must not use any external knowledge or prior training. Your goal is to be precise, factual, and aware of the limitations of the provided information.","Jesteś zaawansowanym asystentem AI zaprojektowanym do odpowiadania na pytania **wyłącznie** na podstawie dostarczonych fragmentów kontekstu. Nie możesz korzystać z żadnej wiedzy zewnętrznej ani wcześniejszego szkolenia. Twoim celem jest bycie precyzyjnym, opartym na faktach i świadomym ograniczeń dostarczonych informacji.","Вы — продвинутый ИИ-ассистент, предназначенный для ответов на вопросы **только** на основе предоставленных отрывков контекста. Вы не должны использовать никаких внешних знаний или предварительного обучения. Ваша цель — быть точным, опираться на факты и осознавать ограничения предоставленной информации.",你係一個先進嘅 AI 助手，專門純粹根據用戶提供嘅上下文段落嚟答問題。你唔可以用弟二啲知識或者以前嘅模型訓練。你嘅目標係要精準、根據事實，同埋清楚知道用戶提供嘅資訊有咩局限。,你是一个高级 AI 助手，旨在**仅**根据提供的上下文段落回答问题。你不得使用任何外部知识或先前的训练。你的目标是精确、基于事实，并清楚了解所提供信息的局限性。,Translate fully
+sys_read_instruction,System Prompt - Read Instruction,Read the following Query and Context Passages carefully.,"Uważnie przeczytaj poniższe Pytanie i Fragmenty Kontekstowe.
+","Внимательно прочитайте следующий запрос и контекстные отрывки.
+-----","仔細閱讀以下嘅查詢同上下文段落。
+-----","请仔细阅读以下 Query 和 Context Passages。
+-----",Translate fully
+sys_query_label,System Prompt - Query Label,QUERY:,PYTANIE:,ЗАПРОС:,查詢：,"查询：
+-----","Translate this label (e.g., Polish: 'PYTANIE:')"
+sys_context_label,System Prompt - Context Label,CONTEXT PASSAGES:,FRAGMENTY KONTEKSTOWE:,КОНТЕКСТНЫЕ ОТРЫВКИ:,上下文段落：,"上下文段落：
+-----",Translate this label.
+sys_instructions_heading,System Prompt - Instructions Heading,**INSTRUCTIONS:**,**INSTRUKCJE:**,**ИНСТРУКЦИИ:**,**指示：**,**说明：**,Translate. Keep markdown bold formatting.
+sys_instr_1,System Prompt - Instruction 1 (Answer Condition),"Your primary task is to answer the QUERY if, and only if, a complete and faithful answer can be derived *solely* from the facts within the CONTEXT PASSAGES.","Twoim głównym zadaniem jest odpowiedzieć na PYTANIE wtedy i tylko wtedy, gdy pełną i wierną odpowiedź można wyprowadzić *wyłącznie* na podstawie faktów zawartych w FRAGMENTACH KONTEKSTOWYCH.","Ваша основная задача — ответить на ЗАПРОС, если и только если полный и достоверный ответ можно вывести *исключительно* из фактов, содержащихся в КОНТЕКСТНЫХ ОТРЫВКАХ.",你嘅首要任務係淨係喺以下嚟個嘅情況之下回答查詢：如果你可以*淨係*根據上下文段落入面嘅事實去推斷出一個完整而且忠於事實嘅答案。,你的首要任务是回答 QUERY，且仅当完整且忠实的回答可以*完全*从 CONTEXT PASSAGES 中的事实推导出来时。,Translate fully. Replace 'QUERY' and 'CONTEXT PASSAGES' with your translated labels from rows above.
+sys_instr_2,System Prompt - Instruction 2 (Reasoning Permission),"You are permitted and expected to perform reasoning, including common-sense inference and basic mathematics, as long as it operates *exclusively* on the information provided in the context.","Masz pozwolenie i powinienś przeprowadzać rozumowanie, w tym wnioskowanie oparte na rozsądku oraz podstawowe obliczenia matematyczne, o ile opiera się ono *wyłącznie* na informacji zawartej w kontekście.","Вам разрешено и предполагается выполнять рассуждения, включая выводы на основе здравого смысла и базовые математические вычисления, при условии, что они опираются *исключительно* на информацию, предоставленную в контексте.",只要你嘅推理係*淨係*基於上下文入面嘅資訊，你可以而且應該做推理，包括基本常識同數學嘅推斷。,你被允许并应当进行推理，包括常识推断和基础数学运算，只要其*完全*基于上下文中提供的信息进行。,Translate fully
+sys_instr_3,System Prompt - Instruction 3 (Refusal Directive),"If a direct and faithful answer is not possible due to one of the issues below, you MUST respond with **only** the corresponding refusal code. Do not add any other text or explanation.","Jeśli bezpośrednia i wierna odpowiedź nie jest możliwa z powodu jednego z poniższych problemów, MUSISZ odpowiedzieć **wyłącznie** odpowiednim kodem odmowy. Nie dodawaj żadnego innego tekstu ani wyjaśnienia.","Если прямой и точный ответ невозможен из-за одной из перечисленных ниже проблем, вы ДОЛЖНЫ ответить **только** соответствующим кодом отказа. Не добавляйте никакого другого текста или пояснений.",如果你因為以下其中一個問題而比唔到一個直接同基於事實嘅答案，你就一定要**淨係**用對應嘅拒絕代碼嚟回應。唔好加任何其他字或者解釋。,如果由于以下问题之一而无法给出直接且忠实的回答，你必须**仅**回复相应的拒绝代码。不要添加任何其他文本或解释。,Translate the instruction text. The actual REFUSE_* codes stay in English.
+refusal_AMBIGUOUS,Refusal Code - REFUSE_AMBIGUOUS_QUERY,"**`REFUSE_AMBIGUOUS_QUERY`**
+When to use: When the query or context creates multiple plausible interpretations, making a single definitive answer impossible.
+Example: Query asks about ""the bat's weight"" after the context mentions both a baseball bat and an animal.","**`REFUSE_AMBIGUOUS_QUERY`**
+Kiedy stosować: Gdy pytanie lub kontekst tworzy wiele wiarygodnych interpretacji, uniemożliwiając udzielenie jednej ostatecznej odpowiedzi.
+Przykład: Zapytanie dotyczy „wagi nietoperza” po tym, jak kontekst wspomina zarówno o kiju baseballowym, jak i o zwierzęciu.","**`REFUSE_AMBIGUOUS_QUERY`**
+Когда использовать: Когда запрос или контекст допускает несколько правдоподобных интерпретаций, что делает невозможным однозначный ответ.
+Пример: Запрос спрашивает о ""весе биты"" после того, как в контексте упоминаются и бейсбольная бита, и животное.","**`REFUSE_AMBIGUOUS_QUERY`**
+用法：當查詢或者上下文有多過一個合理嘅解讀放法，令到你唔可以推斷一個明確嘅答案。
+例子：查詢係問「the bat's weight」，但係上下文同時提及一支棒球棍同一隻動物。","**`REFUSE_AMBIGUOUS_QUERY`**
+使用时机：当查询或上下文产生多种合理的解释，导致无法给出单一明确的答案时。
+示例：查询询问“the bat's weight”，而上下文同时提到了棒球棒和动物。",Keep `REFUSE_AMBIGUOUS_QUERY` in English. Translate the description and example.
+refusal_CONTRADICTORY,Refusal Code - REFUSE_CONTRADICTORY_CONTEXT,"**`REFUSE_CONTRADICTORY_CONTEXT`**
+When to use: When the context contains directly contradictory or logically inconsistent information that is essential for answering the query.
+Example: One sentence states ""revenue was $10M"" and another states ""revenue was $12M"".","**`REFUSE_CONTRADICTORY_CONTEXT`**
+Kiedy stosować: Gdy kontekst zawiera bezpośrednio sprzeczne lub logicznie niespójne informacje, które są kluczowe do udzielenia odpowiedzi na pytanie.
+Przykład: Jedno zdanie stwierdza „przychód wyniósł 10 mln USD”, a drugie stwierdza „przychód wyniósł 12 mln USD”.","**`REFUSE_CONTRADICTORY_CONTEXT`**
+Когда использовать: Когда контекст содержит прямо противоречивую или логически несогласованную информацию, которая необходима для ответа на запрос.
+Пример: В одном предложении указано «выручка составила $10 млн», а в другом — «выручка составила $12 млн».","**`REFUSE_CONTRADICTORY_CONTEXT`**
+用法：當上下文有直接嘅矛盾或者邏輯上不一致嘅資訊，而你一定要用到呢啲資訊嚟回答查詢。
+例子：一句話講「收入係 $10M」，另一句話就講「收入係 $12M」。","**`REFUSE_CONTRADICTORY_CONTEXT`**
+适用场景：当上下文中包含直接矛盾或逻辑不一致的信息，且这些信息对于回答查询至关重要时。
+示例：一句话指出“收入为 $10M”，另一句话指出“收入为 $12M”。",Keep `REFUSE_CONTRADICTORY_CONTEXT` in English. Translate the description and example.
+refusal_MISSING,Refusal Code - REFUSE_INFO_MISSING_IN_CONTEXT,"**`REFUSE_INFO_MISSING_IN_CONTEXT`**
+When to use: When the context is silent on the matter. The specific fact, entity, or value needed to answer is entirely absent. Use this when the information is simply not there.
+Example: Query asks ""Who is the CEO?"" but the context only describes the company's products.","**`REFUSE_INFO_MISSING_IN_CONTEXT`**
+Kiedy stosować: Gdy kontekst milczy na dany temat. Konkretny fakt, encja lub wartość potrzebna do odpowiedzi są całkowicie nieobecne. Stosuj to, gdy informacji po prostu tam nie ma.
+Przykład: Pytanie brzmi „Kim jest CEO?”, ale kontekst opisuje jedynie produkty firmy.","**`REFUSE_INFO_MISSING_IN_CONTEXT`**
+Когда использовать: Когда контекст ничего не сообщает по данному вопросу. Конкретный факт, сущность или значение, необходимые для ответа, полностью отсутствуют. Используйте это, когда информации просто нет.
+Пример: Запрос спрашивает «Кто является генеральным директором?», но в контексте описываются только продукты компании.","**`REFUSE_INFO_MISSING_IN_CONTEXT`**
+用法：當上下文無提及呢樣嘢。你要用嚟回答查詢嘅嘢或者數值完全冇喺上下文出現過。當資訊根本唔喺度嗰陣就用呢個代碼。
+例子：查詢問「邊個係 CEO？」，但係上下文淨係描述緊公司嘅產品。","**`REFUSE_INFO_MISSING_IN_CONTEXT`**
+何时使用：当上下文对此事只字未提时。回答所需的具体事实、实体或数值完全缺失。当信息根本不存在时，请使用此代码。
+示例：查询询问“谁是CEO？”，但上下文仅描述了公司的产品。",Keep `REFUSE_INFO_MISSING_IN_CONTEXT` in English. Translate the description and example.
+refusal_FALSE_PREMISE,Refusal Code - REFUSE_FALSE_PREMISE_IN_QUERY,"**`REFUSE_FALSE_PREMISE_IN_QUERY`**
+When to use: When the query assumes a fact (e.g., an event that never happened, a non-existent object) that is contradicted by or unsupported by the context.
+Example: Query asks ""Why did the company's Mars division fail?"" but the context states the company has no Mars division.","**`REFUSE_FALSE_PREMISE_IN_QUERY`**
+Kiedy stosować: Gdy pytanie zakłada fakt (np. wydarzenie, które nigdy się nie wydarzyło, nieistniejący obiekt), który jest sprzeczny z kontekstem lub nie znajduje w nim poparcia.
+Przykład: Pytanie brzmi ""Dlaczego dział Mars firmy odniósł porażkę?"", ale z kontekstu wynika, że firma nie ma działu Mars.","**`REFUSE_FALSE_PREMISE_IN_QUERY`**
+Когда использовать: Когда запрос исходит из факта (например, событие, которое никогда не происходило, несуществующий объект), который противоречит контексту или не подтверждается им.
+Пример: В запросе спрашивается «Почему марсианское подразделение компании потерпело неудачу?», но в контексте указано, что у компании нет марсианского подразделения.","**`REFUSE_FALSE_PREMISE_IN_QUERY`**
+用法：當查詢假設咗一個同上下文有矛盾或者上下文冇提到嘅事實（例如一個從來冇發生過或者唔存在嘅嘅嘢）。
+例子：查詢問「點解公司嘅 Mars 部門會失敗？」但係上下文話公司冇 Mars 部門。","**`REFUSE_FALSE_PREMISE_IN_QUERY`**
+使用时机：当查询假设了一个与上下文相矛盾或上下文不支持的事实（例如，从未发生过的事件、不存在的对象）时。
+示例：查询问“为什么公司的火星部门失败了？”但上下文说明该公司没有火星部门。",Keep `REFUSE_FALSE_PREMISE_IN_QUERY` in English. Translate the description and example.
+refusal_GRANULARITY,Refusal Code - REFUSE_GRANULARITY_MISMATCH,"**`REFUSE_GRANULARITY_MISMATCH`**
+When to use: When the context contains relevant information, but it is at the wrong scale or level of abstraction. Answering would require a transformation (e.g., aggregation, averaging, generalization) that is impossible or invalid with the given data. This is different from REFUSE_INFO_MISSING_IN_CONTEXT because the information is not absent, just incompatible.
+Example: Query asks for the ""average employee salary,"" but the context only provides individual salaries for two of the fifty employees.","**`REFUSE_GRANULARITY_MISMATCH`**
+Kiedy stosować: Gdy kontekst zawiera istotne informacje, ale są one w niewłaściwej skali lub na niewłaściwym poziomie ogólności. Udzielenie odpowiedzi wymagałoby transformacji (np. agregacji, uśredniania, uogólnienia), która jest niemożliwa lub nieprawidłowa przy danych danych. Różni się to od REFUSE_INFO_MISSING_IN_CONTEXT, ponieważ informacje nie są nieobecne, po prostu są niekompatybilne.
+Przykład: Pytanie pyta o „średnią pensję pracownika”, ale kontekst zawiera jedynie indywidualne pensje dwóch z pięćdziesięciu pracowników.","**`REFUSE_GRANULARITY_MISMATCH`**
+Когда использовать: Когда контекст содержит релевантную информацию, но она представлена в неправильном масштабе или на неверном уровне абстракции. Для ответа потребовалось бы преобразование (например, агрегация, усреднение, обобщение), которое невозможно или некорректно выполнить с имеющимися данными. Это отличается от REFUSE_INFO_MISSING_IN_CONTEXT, поскольку информация не отсутствует, а просто несовместима.
+Пример: Запрос требует «среднюю зарплату сотрудников», но в контексте приведены лишь индивидуальные зарплаты двух из пятидесяти сотрудников.","**`REFUSE_GRANULARITY_MISMATCH`**
+用法：當上下文有相關嘅資訊，但係規模或者抽象程度唔啱用，而你要回答查詢就要做一啲轉化（例如要加埋曬啲數據，計平均，或者要做一啲概括），而且基於用戶提供嘅資訊，呢個轉化係唔可能或者唔合理。呢點同 REFUSE_INFO_MISSING_IN_CONTEXT 唔同，因為資訊唔係無，但係唔啱用。
+例子：查詢要求「員工平均人工」，但係上下文淨係提供五十個員工中其中兩個嘅個別人工。","**`REFUSE_GRANULARITY_MISMATCH`**
+何时使用：当上下文包含相关信息，但信息的尺度或抽象层级不匹配时。回答需要进行一种转换（例如，聚合、求平均、概括），而这种转换在给定数据下是不可能或无效的。这与 REFUSE_INFO_MISSING_IN_CONTEXT 不同，因为信息并非缺失，只是不兼容。
+示例：查询要求获取“平均员工薪资”，但上下文仅提供了五十名员工中两名的个人薪资。",Keep `REFUSE_GRANULARITY_MISMATCH` in English. Translate the description and example.
+refusal_NONFACTUAL,Refusal Code - REFUSE_NONFACTUAL_QUERY,"**`REFUSE_NONFACTUAL_QUERY`**
+When to use: When the query asks for subjective opinions, predictions, hypotheticals, or moral judgments that cannot be objectively derived from the provided facts.
+Example: Query asks ""Is this a good investment?"" but the context only provides the stock price.","**`REFUSE_NONFACTUAL_QUERY`**
+Kiedy stosować: Gdy zapytanie dotyczy subiektywnych opinii, przewidywań, hipotez lub ocen moralnych, których nie można obiektywnie wyprowadzić z podanych faktów.
+Przykład: Zapytanie brzmi „Czy to dobra inwestycja?”, ale kontekst podaje jedynie cenę akcji.","**`REFUSE_NONFACTUAL_QUERY`**
+Когда использовать: Когда запрос требует субъективных мнений, прогнозов, гипотетических предположений или моральных оценок, которые невозможно объективно вывести из предоставленных фактов.
+Пример: Запрос «Стоит ли инвестировать в это?», но в контексте указана только цена акций.","**`REFUSE_NONFACTUAL_QUERY`**
+用法：當查詢要你提供主觀意見、預測、假設情況或者道德判斷，但係呢啲唔可以純粹基於事實，客觀咁推斷出嚟。
+例子：查詢問「呢個係咪一個好嘅投資？」，但係上下文淨係提供咗股價。","**`REFUSE_NONFACTUAL_QUERY`**
+何时使用：当查询要求提供主观意见、预测、假设或无法从所提供的事实中客观得出的道德判断时。
+示例：查询询问“这是一项好的投资吗？”，但上下文仅提供了股票价格。",Keep `REFUSE_NONFACTUAL_QUERY` in English. Translate the description and example.
+refusal_OTHER,Refusal Code - REFUSE_OTHER,"**`REFUSE_OTHER`**
+When to use: For any other specific issue not covered above that makes a faithful answer impossible.","**`REFUSE_OTHER`**
+Kiedy stosować: W przypadku każdego innego konkretnego problemu nieuwzględnionego powyżej, który uniemożliwia udzielenie wiarygodnej odpowiedzi.","**`REFUSE_OTHER`**
+Когда использовать: Для любых других специфических проблем, не охваченных выше, которые делают невозможным честный ответ.","**`REFUSE_OTHER`**
+用法：用喺上面無提及到嘅問題，但係嚟個問題令到你唔可以基於事實咁回答查詢。","**`REFUSE_OTHER`**
+何时使用：用于上述未涵盖的任何其他导致无法给出忠实回答的具体问题。",Keep `REFUSE_OTHER` in English. Translate the description.
+judge_intro,Judge Prompt - Introduction,Analyze the following model response by performing BOTH classification and quality evaluation:,"Przeanalizuj następującą odpowiedź modelu, wykonując ZARÓWNO klasyfikację, jak i ocenę jakości:","Проанализируйте следующий ответ модели, выполнив И классификацию, и оценку качества:
+-----",分析以下模型嘅回答，而同時分類同埋評估嚟啲回答質素：,通过执行分类和质量评估来分析以下模型响应：,Translate fully
+judge_step1,Judge Prompt - Step 1 (Classification),"STEP 1: CLASSIFICATION
+Determine if this model response is:
+1. An attempt to answer the query → ""answer_attempt""
+2. A refusal with a specific code:
+   - REFUSE_AMBIGUOUS_QUERY
+   - REFUSE_CONTRADICTORY_CONTEXT
+   - REFUSE_INFO_MISSING_IN_CONTEXT
+   - REFUSE_FALSE_PREMISE_IN_QUERY
+   - REFUSE_GRANULARITY_MISMATCH
+   - REFUSE_NONFACTUAL_QUERY
+   - REFUSE_OTHER
+
+Look for refusal codes even if they appear with additional text.","KROK 1: KLASYFIKACJA
+Określ, czy ta odpowiedź modelu to:
+1. Próba odpowiedzi na pytanie → ""answer_attempt""
+2. Odmowa z określonym kodem:
+   - REFUSE_AMBIGUOUS_QUERY
+   - REFUSE_CONTRADICTORY_CONTEXT
+   - REFUSE_INFO_MISSING_IN_CONTEXT
+   - REFUSE_FALSE_PREMISE_IN_QUERY
+   - REFUSE_GRANULARITY_MISMATCH
+   - REFUSE_NONFACTUAL_QUERY
+   - REFUSE_OTHER
+
+Szukaj kodów odmowy nawet wtedy, gdy pojawiają się one z dodatkowym tekstem.","ШАГ 1: CLASSIFICATION
+Определите, является ли этот ответ модели:
+1. Попыткой ответить на запрос → ""answer_attempt""
+2. Отказом с определенным кодом:
+   - REFUSE_AMBIGUOUS_QUERY
+   - REFUSE_CONTRADICTORY_CONTEXT
+   - REFUSE_INFO_MISSING_IN_CONTEXT
+   - REFUSE_FALSE_PREMISE_IN_QUERY
+   - REFUSE_GRANULARITY_MISMATCH
+   - REFUSE_NONFACTUAL_QUERY
+   - REFUSE_OTHER
+
+Ищите коды отказа, даже если они появляются с дополнительным текстом.","步驟 1：CLASSIFICATION
+判斷呢個模型嘅回答係咪：
+1. 嘗試緊回答查詢 → ""answer_attempt""
+2. 拒絕回答而且用上特定嘅代碼：
+   - REFUSE_AMBIGUOUS_QUERY
+   - REFUSE_CONTRADICTORY_CONTEXT
+   - REFUSE_INFO_MISSING_IN_CONTEXT
+   - REFUSE_FALSE_PREMISE_IN_QUERY
+   - REFUSE_GRANULARITY_MISMATCH
+   - REFUSE_NONFACTUAL_QUERY
+   - REFUSE_OTHER
+
+拒絕代碼就算連埋第二啲字一齊出現都當用咗。","步骤 1：CLASSIFICATION
+判断此模型回复是否为：
+1. 尝试回答查询 → ""answer_attempt""
+2. 带有特定代码的拒绝：
+   - REFUSE_AMBIGUOUS_QUERY
+   - REFUSE_CONTRADICTORY_CONTEXT
+   - REFUSE_INFO_MISSING_IN_CONTEXT
+   - REFUSE_FALSE_PREMISE_IN_QUERY
+   - REFUSE_GRANULARITY_MISMATCH
+   - REFUSE_NONFACTUAL_QUERY
+   - REFUSE_OTHER
+
+即使拒绝代码伴随额外文本出现，也要查找这些拒绝代码。","Translate instructions. Keep REFUSE_* codes and ""answer_attempt"" in English (these are output labels the judge must produce)."
+judge_step2,Judge Prompt - Step 2 (Quality Evaluation),"STEP 2: QUALITY EVALUATION
+If the response is an answer attempt AND reference answers are provided, evaluate quality:
+- Score 1: Not relevant to query and reference answers
+- Score 2: According to reference answers but not relevant to query
+- Score 3: Relevant to query and reference answers but contains mistakes
+- Score 4: Relevant and has exact same metrics as reference, but not concise
+- Score 5: Relevant to query and fully correct according to reference answers
+
+If the response is a refusal OR no reference answers provided, use ""N/A"".","KROK 2: OCENA JAKOŚCI
+Jeśli odpowiedź to answer_attempt i podano odpowiedzi referencyjne, oceń jakość:
+- Wynik 1: Nieistotne dla zapytania i odpowiedzi referencyjnych
+- Wynik 2: Zgodne z odpowiedziami referencyjnymi, ale nieistotne dla pytania
+- Wynik 3: Istotne dla pytania i odpowiedzi referencyjnych, ale zawiera błędy
+- Wynik 4: Istotne i ma dokładnie te same metryki co odniesienie, ale nie jest zwięzłe
+- Wynik 5: Istotne dla pytania i w pełni poprawne zgodnie z odpowiedziami referencyjnymi
+
+Jeśli odpowiedź to odmowa ALBO nie podano odpowiedzi referencyjnych, użyj ""N/A"".","ШАГ 2: ОЦЕНКА КАЧЕСТВА
+Если ответ является answer_attempt И предоставлены эталонные ответы, оцените качество:
+- Score 1: Не относится к запросу и эталонным ответам
+- Score 2: Соответствует эталонным ответам, но не относится к запросу
+- Score 3: Относится к запросу и эталонным ответам, но содержит ошибки
+- Score 4: Относится к запросу и содержит те же метрики, что и эталон, но не является кратким
+- Score 5: Относится к запросу и полностью корректен согласно эталонным ответам
+
+Если ответ является отказом ИЛИ эталонные ответы не предоставлены, используйте ""N/A"".","步驟 2：質素評估
+如果回答係 answer_attempt 而且有參考答案，評估質素：
+- Score 1：答案同查詢或者參考答案都無關
+- Score 2：答案符合參考答案但係同查詢無關
+- Score 3：答案同查詢同埋參考答案都相關但係答案有錯誤
+- Score 4：答案有關而且同參考答案嘅指標完全一樣，但係唔夠簡潔
+- Score 5：答案同查詢有關而且根據參考答案完全正確
+
+如果回應係拒絕或者無參考答案，用 ""N/A""。","步骤 2：质量评估
+如果回复是 answer_attempt 且提供了参考答案，请评估质量：
+- Score 1: 与查询和参考答案无关
+- Score 2: 符合参考答案但与查询无关
+- Score 3: 与查询和参考答案相关但包含错误
+- Score 4: 相关且具有与参考答案完全相同的指标，但不简洁
+- Score 5: 与查询相关且根据参考答案完全正确
+
+如果回复是拒绝或未提供参考答案，请使用 ""N/A""。","Translate descriptions. Keep score numbers (1-5) and ""N/A"" as-is."
+judge_input_labels,Judge Prompt - Input Labels,"QUERY:
+{query}
+
+MODEL RESPONSE:
+{model_output}
+
+REFERENCE ANSWERS:
+{formatted_correct}","PYTANIE:
+{query}
+
+ODPOWIEDŹ MODELU:
+{model_output}
+
+ODPOWIEDZI REFERENCYJNE:
+{formatted_correct}","ЗАПРОС:
+{query}
+
+ОТВЕТ МОДЕЛИ:
+{model_output}
+
+ЭТАЛОННЫЕ ОТВЕТЫ:
+{formatted_correct}","查詢：
+{query}
+
+模型回答：
+{model_output}
+
+參考答案：
+{formatted_correct}","查询：
+{query}
+
+模型回复：
+{model_output}
+
+参考答案：
+{formatted_correct}","Translate the labels (QUERY, MODEL RESPONSE, REFERENCE ANSWERS). Keep {query}, {model_output}, {formatted_correct} as-is - they are code placeholders filled at inference time."
+judge_output_format,Judge Prompt - Output Format,"Respond in this exact format:
+CLASSIFICATION: [answer_attempt OR one of the REFUSE_* codes]
+QUALITY_SCORE: [1-5 if answer_attempt with references, otherwise N/A]
+EXPLANATION: [brief reasoning for both classification and score]","Odpowiedz dokładnie w tym formacie:
+CLASSIFICATION: [answer_attempt LUB jeden z kodów REFUSE_*]
+QUALITY_SCORE: [1-5 jeśli answer_attempt z odniesieniami, w przeciwnym razie N/A]
+EXPLANATION: [krótkie uzasadnienie zarówno klasyfikacji, jak i oceny]","Ответьте в следующем точном формате:
+CLASSIFICATION: [answer_attempt ИЛИ один из кодов REFUSE_*]
+QUALITY_SCORE: [1-5 если answer_attempt со ссылками, иначе N/A]
+EXPLANATION: [краткое обоснование и для классификации, и для оценки]","用以下呢個格式回答：
+CLASSIFICATION: [answer_attempt 或者其中一個 REFUSE_* 代碼]
+QUALITY_SCORE: [如果係 answer_attempt 而且有參考答案就填 1-5，唔係就填 N/A]
+EXPLANATION: [簡略咁解析你分類同評分嘅決定]","请按以下确切格式回复：
+CLASSIFICATION: [answer_attempt 或 REFUSE_* 代码之一]
+QUALITY_SCORE: [如果 answer_attempt 带有参考文献则为 1-5，否则为 N/A]
+EXPLANATION: [对分类和评分的简要推理]","Translate the instruction sentence. Keep CLASSIFICATION, QUALITY_SCORE, EXPLANATION as English output field names. Keep REFUSE_* codes, ""answer_attempt"", and ""N/A"" in English."
