@@ -94,6 +94,7 @@ def configure_bedrock_client_logging() -> None:
     """
     litellm.suppress_debug_info = True
     litellm.set_verbose = False
+
     for name in _QUIET_LOGGERS:
         logging.getLogger(name).setLevel(logging.WARNING)
 
@@ -113,8 +114,10 @@ def format_exception_for_log(exc: BaseException) -> str:
         truncated one-line message.
     """
     text = str(exc).replace("\n", " ").strip()
+
     if len(text) > _EXC_LOG_MAX_LEN:
         return text[: _EXC_LOG_MAX_LEN - 3] + "..."
+
     return text
 
 
@@ -134,14 +137,20 @@ def _exception_blob(exc: BaseException) -> str:
     """
     parts: list[str] = [str(exc), repr(exc)]
     response = getattr(exc, "response", None)
+
     if response is not None:
         parts.append(str(response))
+
     message = getattr(exc, "message", None)
+
     if message is not None:
         parts.append(str(message))
+
     body = getattr(exc, "body", None)
+
     if body is not None:
         parts.append(str(body))
+
     return " ".join(parts).lower()
 
 
@@ -160,19 +169,27 @@ def classify_error(exc: BaseException) -> str:
         one of retryable_throttle, retryable_transient, or permanent.
     """
     text = _exception_blob(exc)
+
     if any(p in text for p in _PERMANENT_PATTERNS):
         return ERROR_PERMANENT
+
     if any(p in text for p in _THROTTLE_PATTERNS):
         return ERROR_RETRYABLE_THROTTLE
+
     if any(p in text for p in _TRANSIENT_PATTERNS):
         return ERROR_RETRYABLE_TRANSIENT
+
     status_code = getattr(exc, "status_code", None)
+
     if status_code == 429:
         return ERROR_RETRYABLE_THROTTLE
+
     if status_code in (502, 503, 504):
         return ERROR_RETRYABLE_TRANSIENT
+
     if status_code in (400, 401, 403, 404, 422):
         return ERROR_PERMANENT
+
     return ERROR_RETRYABLE_TRANSIENT
 
 
@@ -193,12 +210,15 @@ def _extract_retry_after_sec(exc: BaseException) -> float | None:
     response = getattr(exc, "response", None)
     if response is None:
         return None
+
     headers = getattr(response, "headers", None)
     if headers is None:
         return None
+
     raw = headers.get("Retry-After") or headers.get("retry-after")
     if raw is None:
         return None
+
     try:
         return float(raw)
     except (TypeError, ValueError):
@@ -223,7 +243,9 @@ def _backoff_seconds(attempt: int, retry_after: float | None) -> float:
     """
     if retry_after is not None and retry_after > 0:
         return max(_BACKOFF_FLOOR_SEC, min(retry_after, _BACKOFF_CEILING_SEC))
+
     exp_cap = min(_BACKOFF_CEILING_SEC, _BACKOFF_FLOOR_SEC * (2 ** min(attempt, 8)))
+
     return random.uniform(_BACKOFF_FLOOR_SEC, exp_cap)
 
 
@@ -245,8 +267,10 @@ def _message_content(response: Any) -> str:
         content = response.choices[0].message.content
     except (AttributeError, IndexError, KeyError, TypeError):
         return ""
+
     if content is None:
         return ""
+
     return str(content)
 
 
@@ -285,6 +309,7 @@ class AdaptiveConcurrency:
         async with self._cond:
             while self._in_flight >= self._limit:
                 await self._cond.wait()
+
             self._in_flight += 1
 
     async def release(self) -> None:
@@ -305,6 +330,7 @@ class AdaptiveConcurrency:
         window_start = now - 60.0
         self._throttle_times = [t for t in self._throttle_times if t >= window_start]
         self._success_streak = 0
+
         if len(self._throttle_times) >= 3 and self._limit > 1:
             self._limit -= 1
             logger.info(
@@ -321,6 +347,7 @@ class AdaptiveConcurrency:
         """
         async with self._cond:
             self._success_streak += 1
+
             if self._success_streak >= 10 and self._limit < self.default_limit:
                 self._limit += 1
                 self._success_streak = 0
@@ -385,10 +412,12 @@ async def acompletion_with_retry(
 
     while True:
         acquired = False
+        sleep_sec = 0.0
         try:
             if adaptive is not None:
                 await adaptive.acquire()
                 acquired = True
+
             response = await litellm.acompletion(
                 model=model,
                 messages=messages,
@@ -399,12 +428,14 @@ async def acompletion_with_retry(
             content = _message_content(response)
             if adaptive is not None:
                 await adaptive.note_success()
+
             if attempt > 0:
                 logger.info(
                     "bedrock ok model=%s after %s failed attempt(s)",
                     model,
                     attempt,
                 )
+
             return content
         except Exception as exc:
             error_class = classify_error(exc)
@@ -455,7 +486,12 @@ async def acompletion_with_retry(
                 sleep_sec,
             )
             attempt += 1
-            await asyncio.sleep(sleep_sec)
         finally:
             if acquired and adaptive is not None:
                 await adaptive.release()
+
+        # backoff happens after the slot is released, otherwise a failing call
+        # would hold its concurrency slot for the whole sleep and throughput
+        # would collapse exactly when the service is throttling us.
+        if sleep_sec > 0:
+            await asyncio.sleep(sleep_sec)

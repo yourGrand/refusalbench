@@ -43,6 +43,7 @@ def load_project_env(
     root = repo_root or REPO_ROOT
     if env_file is not None:
         path = Path(env_file)
+
         if not path.is_absolute():
             path = root / path
     else:
@@ -70,6 +71,7 @@ def normalize_bedrock_bearer_env() -> None:
     """
     bedrock = os.environ.get("AWS_BEARER_TOKEN_BEDROCK", "").strip()
     generic = os.environ.get("AWS_BEARER_TOKEN", "").strip()
+
     if generic and not bedrock:
         os.environ["AWS_BEARER_TOKEN_BEDROCK"] = generic
     elif bedrock and not generic:
@@ -90,6 +92,7 @@ def get_bedrock_bearer_token() -> str | None:
         or os.environ.get("AWS_BEARER_TOKEN")
         or ""
     ).strip()
+
     return raw or None
 
 
@@ -104,10 +107,13 @@ def has_bedrock_auth_configured() -> bool:
     """
     if get_bedrock_bearer_token():
         return True
+
     if os.environ.get("AWS_PROFILE"):
         return True
+
     if os.environ.get("AWS_ACCESS_KEY_ID") and os.environ.get("AWS_SECRET_ACCESS_KEY"):
         return True
+
     return False
 
 
@@ -163,22 +169,28 @@ def get_judge_models() -> dict[str, str]:
 
     for name, env_key in JUDGE_ENV_KEYS.items():
         raw = os.environ.get(env_key, "").strip()
+
         if not raw:
             missing.append(env_key)
             continue
+
         if _looks_like_placeholder(raw):
             placeholder.append(env_key)
             continue
+
         judges[name] = raw
 
     if missing or placeholder:
         lines = [
             "bedrock judge model ids must be set in .env (see .env.example).",
         ]
+
         if missing:
             lines.append("missing: " + ", ".join(missing))
+
         if placeholder:
             lines.append("replace placeholders for: " + ", ".join(placeholder))
+
         raise SystemExit("\n".join(lines))
 
     return judges
@@ -192,6 +204,7 @@ def ensure_aws_credentials_hint() -> None:
     """
     if has_bedrock_auth_configured():
         return
+
     logger.warning(
         "no bedrock auth in environment after loading .env "
         "(set AWS_BEARER_TOKEN or AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY or AWS_PROFILE). "
