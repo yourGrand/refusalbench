@@ -87,3 +87,5 @@ temp/
 *.pdf
 *.svg
 !docs/images/*
+# figures used by notebooks/FINDINGS.md, exported by notebooks/export_figures.py
+!notebooks/figures/*.png
