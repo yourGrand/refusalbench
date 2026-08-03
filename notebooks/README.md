@@ -1,5 +1,7 @@
 # Analysis notebooks (pilot v2)
 
+> **Start here for results:** [`FINDINGS.md`](FINDINGS.md) summarises what the three notebooks found and is meant to be readable on its own. This README covers how to regenerate the data and run the notebooks. Figures used by the report are exported from the executed notebooks by [`export_figures.py`](export_figures.py) into `figures/`.
+
 These notebooks analyse the multilingual **pilot v2** run. They read aggregated judge outputs under `data/` and stress-test the main claims from [`pilot_v2_eval_exploration.ipynb`](pilot_v2_eval_exploration.ipynb). Judging and aggregation are documented in [`refusalbench/multilingual/README.md`](../refusalbench/multilingual/README.md).
 
 ## Shared reference
@@ -18,7 +20,7 @@ Everything below is expected on disk when you run the notebooks but may not be i
 
 | Path | Role |
 |------|------|
-| `data/pilot_v2_infer/inference_results/0/{en,pl,ru,zh_cmn,zh_yue}.jsonl` | Full run: model responses for 180 base items × 5 languages (900 records) |
+| `data/pilot_v2_infer/inference_results/0/{en,pl,ru,zh_cmn,zh_yue}.jsonl` | Full run: model responses for 180 base items × 5 languages (900 records). The evaluated model is **Llama 3.1 70B**, recorded as `llama3.1:70b` in each record's `response_metadata.model` |
 | `data/pilot_v2_infer/inference_results/3/`, `5/`, `8/` | Leakage-filtered subsets of the same prompts (18, 30, 55 items). Same filename pattern per language |
 | `data/pilot_v2_eval/` | Canonical evaluation: English judge instructions for all languages |
 | `data/pilot_v2_eval_localised/` | Same inference, judges instructed in each target language (`--judge-prompt-language target`) |
