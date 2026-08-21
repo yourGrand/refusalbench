@@ -27,6 +27,9 @@ wheels/
 .ipynb_checkpoints
 *.ipynb_checkpoints/
 
+# marimo session cache, written when notebooks are executed or exported
+__marimo__/
+
 # Configuration
 config.py
 .env

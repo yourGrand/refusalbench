@@ -17,6 +17,7 @@ dependencies = [
     "boto3>=1.26.0",
     "botocore>=1.29.0",
     "matplotlib>=3.5.0",
+    "marimo>=0.23.16",
 ]
 
 [dependency-groups]
@@ -28,6 +29,9 @@ dev = [
     "plotly>=5.0.0",
     "pytest>=9.1.1",
 ]
+
+[tool.ruff]
+exclude = ["notebooks/rendered"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

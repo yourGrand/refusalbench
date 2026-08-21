@@ -155,7 +155,7 @@ uv run python -m refusalbench.multilingual.aggregate \
 | `judge_agreement.csv` | Pairwise and Fleiss agreement statistics. |
 | `failures.csv` | Non-OK rows from the raw JSONL (overwrites the judge-stage `failures.csv` in the same directory). |
 
-Ground truth label for answerable items is `ANSWER_CORRECTLY`. Judge classifications use `answer_attempt` or a `REFUSE_*` code (see `VALID_REFUSAL_CODES` in code). Metric definitions match `aggregate.compute_metrics_block` (used in `notebooks/pilot_v2_eval_exploration.ipynb`).
+Ground truth label for answerable items is `ANSWER_CORRECTLY`. Judge classifications use `answer_attempt` or a `REFUSE_*` code (see `VALID_REFUSAL_CODES` in code). Metric definitions match `aggregate.compute_metrics_block` (used in `notebooks/rendered/pilot_v2_eval_exploration.ipynb`).
 
 You can also call `aggregate.aggregate(...)` from Python with the same paths.
 
@@ -167,9 +167,9 @@ These notebooks expect aggregated CSVs under `data/pilot_v2_eval/` (and optional
 
 | Notebook | Reads |
 |----------|--------|
-| `notebooks/pilot_v2_eval_exploration.ipynb` | `consensus.csv`, `judgments_merged.csv`, `metrics_by_language.csv`, `metrics_by_stratum.csv`, `judge_agreement.csv`, `failures.csv` |
-| `notebooks/pilot_v2_judge_prompt_language.ipynb` | Canonical vs localised eval dirs (same CSV set), plus shared prompts CSV |
-| `notebooks/pilot_v2_leakage_subsets.ipynb` | Full-run `consensus.csv` plus inference under `data/pilot_v2_infer/inference_results/{0,3,5,8}/` (filters by id, does not re-judge splits) |
+| `notebooks/rendered/pilot_v2_eval_exploration.ipynb` | `consensus.csv`, `judgments_merged.csv`, `metrics_by_language.csv`, `metrics_by_stratum.csv`, `judge_agreement.csv`, `failures.csv` |
+| `notebooks/rendered/pilot_v2_judge_prompt_language.ipynb` | Canonical vs localised eval dirs (same CSV set), plus shared prompts CSV |
+| `notebooks/rendered/pilot_v2_leakage_subsets.ipynb` | Full-run `consensus.csv` plus inference under `data/pilot_v2_infer/inference_results/{0,3,5,8}/` (filters by id, does not re-judge splits) |
 
 Run notebooks from `notebooks/` or the repo root. They resolve `REPO` by looking for `data/pilot_v2_eval`.
 
